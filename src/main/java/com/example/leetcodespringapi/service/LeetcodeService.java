@@ -2,6 +2,7 @@ package com.example.leetcodespringapi.service;
 
 import com.example.leetcodespringapi.dto.request.Query;
 import com.example.leetcodespringapi.dto.response.Data;
+import com.example.leetcodespringapi.dto.response.Response;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 
@@ -16,29 +17,30 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class LeetcodeService {
-    public Data sendRequest(String username) throws IOException {
+    public Response sendRequest(String username) throws IOException {
         Query query = new Query();
         query.getVariables().setUsername(username);
-
+        Gson gson = new Gson();
+        String json = gson.toJson(query);
         URL url = new URL("https://leetcode.com/graphql");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept", "application/json");
         connection.setDoOutput(true);
-        String body = query.toString();
-        OutputStream os = connection.getOutputStream();
-        byte[] input = body.getBytes();
-        os.write(input, 0, input.length);
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)
-        );
-        StringBuilder sb = new StringBuilder();
-        String line = null;
-        while((line = in.readLine()) != null) {
-            sb.append(line.trim());
+        try(OutputStream os = connection.getOutputStream();) {
+            byte[] input = json.getBytes();
+            os.write(input, 0, input.length);
         }
-        Gson gson = new Gson();
-        return gson.fromJson(sb.toString(), Data.class);
+        StringBuilder sb = new StringBuilder();
+        try(BufferedReader in = new BufferedReader(
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)
+        );) {
+            String line = null;
+            while((line = in.readLine()) != null) {
+                sb.append(line.trim());
+            }
+        }
+        return gson.fromJson(sb.toString(), Response.class);
     }
 }
