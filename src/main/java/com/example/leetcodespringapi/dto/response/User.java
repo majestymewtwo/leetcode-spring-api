@@ -4,7 +4,7 @@ public class User {
     private Contributions contributions;
     private Profile profile;
     private String submissionCalendar;
-    private SubmissionStats submissionStats;
+    private SubmissionStats submitStats;
 
     public Contributions getContributions() {
         return contributions;
@@ -31,10 +31,10 @@ public class User {
     }
 
     public SubmissionStats getSubmissionStats() {
-        return submissionStats;
+        return submitStats;
     }
 
     public void setSubmissionStats(SubmissionStats submissionStats) {
-        this.submissionStats = submissionStats;
+        this.submitStats = submissionStats;
     }
 }
